@@ -23,8 +23,9 @@ var App = (function() {
     this.listenForMicrophone();
   };
 
+  // Get pitch via autocorrelation
   // Autocorrelation algorithm snagged from: https://github.com/cwilso/PitchDetect
-  App.prototype.autoCorrelate = function(buf){
+  App.prototype.getPitch = function(buf){
     var bufLen = buf.length,
         periods = this.periods,
         periodLen = periods.length,
@@ -32,16 +33,11 @@ var App = (function() {
         sampleRate = this.sampleRate,
         minCorrelation = this.opt.correlationMin;
 
-    // check to see if enough signal
-    var rms = this._rootMeanSquare(buf);
-    if (rms < this.opt.minRms) return -1;
-
     var pitch = -1;
     var best_offset = -1;
     var best_correlation = 0;
     var foundGoodCorrelation = false;
     var correlations = new Array(maxSamples);
-
     var lastCorrelation=1;
 
     for (i=0; i<periodLen; i++) {
@@ -74,6 +70,19 @@ var App = (function() {
     return pitch;
   };
 
+  // Get volume via root mean square of buffer
+  App.prototype.getVolume = function(arr) {
+    var rms = 0,
+        arrLen = arr.length;
+
+    for (var i=0; i<arrLen; i++) {
+      var val = arr[i];
+      rms += val * val;
+    }
+
+    return Math.sqrt(rms/arrLen);
+  };
+
   App.prototype.listen = function(){
     // stop listening
     if (!this.listening) {
@@ -92,10 +101,13 @@ var App = (function() {
     var buffer = new Float32Array(this.bufferLen);
     this.analyzer.getFloatTimeDomainData(buffer);
 
-    // retrieve pitch via autocorrelation
-    var pitch = this.autoCorrelate(buffer);
-    var volume = this._rootMeanSquare(buffer);
-    // this.pitch_buffer.push(pitch);
+    // check to see if enough signal
+    var volume = this.getVolume(buffer);
+    var pitch = -1;
+    if (volume >= this.opt.minRms) {
+      // retrieve pitch via autocorrelation
+      pitch = this.getPitch(buffer);
+    }
 
     this.render(pitch, volume);
 
@@ -181,30 +193,6 @@ var App = (function() {
     for(var i = minPeriod; i <= maxPeriod; i++) {
       this.periods.push(i);
     }
-  };
-
-  App.prototype._mean = function(arr) {
-    var sum = 0,
-        arrLen = arr.length;
-
-    for (var i=0; i<arrLen; i++) {
-      var val = arr[i];
-      sum += val;
-    }
-
-    return arrLen <= 0 ? 0 : sum / arrLen;
-  };
-
-  App.prototype._rootMeanSquare = function(arr) {
-    var rms = 0,
-        arrLen = arr.length;
-
-    for (var i=0; i<arrLen; i++) {
-      var val = arr[i];
-      rms += val * val;
-    }
-
-    return Math.sqrt(rms/arrLen);
   };
 
   return App;
