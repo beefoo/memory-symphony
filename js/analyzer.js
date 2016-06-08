@@ -1,21 +1,21 @@
-var App = (function() {
-  function App(options) {
+var Analyzer = (function() {
+  function Analyzer(options) {
     var defaults = {
-      correlationMin: 0.9,
+      correlationMin: 0.9,  // for pitch analysis
       fftsize: 2048,
       // fundamental frequency of speech can vary from 40 Hz for low-pitched male voices
       // to 600 Hz for children or high-pitched female voices
       // https://en.wikipedia.org/wiki/Pitch_detection_algorithm#Fundamental_frequency_of_speech
       frequencyMin: 40,
       frequencyMax: 600,
-      minRms: 0.01, // min signal
+      minRms: 0.01,         // min signal
       phraseDurationMin: 10 // in milliseconds
     };
     this.opt = _.extend({}, defaults, options);
     this.init();
   }
 
-  App.prototype.init = function(){
+  Analyzer.prototype.init = function(){
     // init audio context
     var AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext;
     this.ctx = new AudioContext();
@@ -25,7 +25,7 @@ var App = (function() {
 
   // Get pitch via autocorrelation
   // Autocorrelation algorithm snagged from: https://github.com/cwilso/PitchDetect
-  App.prototype.getPitch = function(buf){
+  Analyzer.prototype.getPitch = function(buf){
     var bufLen = buf.length,
         periods = this.periods,
         periodLen = periods.length,
@@ -71,7 +71,7 @@ var App = (function() {
   };
 
   // Get volume via root mean square of buffer
-  App.prototype.getVolume = function(arr) {
+  Analyzer.prototype.getVolume = function(arr) {
     var rms = 0,
         arrLen = arr.length;
 
@@ -83,7 +83,7 @@ var App = (function() {
     return Math.sqrt(rms/arrLen);
   };
 
-  App.prototype.listen = function(){
+  Analyzer.prototype.listen = function(){
     // stop listening
     if (!this.listening) {
       if (this.lastTime) this.endTime = this.lastTime;
@@ -117,7 +117,7 @@ var App = (function() {
     // setTimeout(function(){_this.listen();}, 2000);
   };
 
-  App.prototype.listenForMicrophone = function(){
+  Analyzer.prototype.listenForMicrophone = function(){
 
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
@@ -126,7 +126,7 @@ var App = (function() {
       this.onStreamError.bind(this));
   };
 
-  App.prototype.listenOn = function(){
+  Analyzer.prototype.listenOn = function(){
     // reset times
     this.lastTime = false;
     this.endTime = false;
@@ -136,12 +136,12 @@ var App = (function() {
     this.listen();
   };
 
-  App.prototype.listenOff = function(){
+  Analyzer.prototype.listenOff = function(){
     this.listening = false;
   };
 
   // Setup analyzer after microphone stream is initialized
-  App.prototype.onStream = function(stream){
+  Analyzer.prototype.onStream = function(stream){
     var input = this.ctx.createMediaStreamSource(stream);
     var analyzer = this.ctx.createAnalyser();
 
@@ -162,12 +162,12 @@ var App = (function() {
     this.listenOn();
   };
 
-  App.prototype.onStreamError = function(e){
+  Analyzer.prototype.onStreamError = function(e){
     console.log(e);
     alert('Error: '+e.name+' (code '+e.code+')');
   };
 
-  App.prototype.render = function(pitch, volume){
+  Analyzer.prototype.render = function(pitch, volume){
     this.$el = this.$el || $('#debug');
 
     if (pitch > 0) {
@@ -179,7 +179,7 @@ var App = (function() {
 
   };
 
-  App.prototype.updatePeriods = function(){
+  Analyzer.prototype.updatePeriods = function(){
     // Determine min/max period
     var minPeriod = this.opt.minPeriod || 2;
     var maxPeriod = this.opt.maxPeriod || this.maxSamples;
@@ -195,10 +195,10 @@ var App = (function() {
     }
   };
 
-  return App;
+  return Analyzer;
 
 })();
 
 $(function(){
-  var app = new App();
+  var analyzer = new Analyzer();
 });
