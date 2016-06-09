@@ -10,7 +10,20 @@ var Player = (function() {
         {file: 'audio/your_eyes_tom.mp3'},
         {file: 'audio/your_eyes_tom2.mp3'},
         {file: 'audio/your_eyes_tom3.mp3'},
-        {file: 'audio/good_day_snare_01.mp3'}
+        // {file: 'audio/good_day_snare_01.mp3'},
+        // {file: 'audio/american_pie_snare.mp3'},
+        // {file: 'audio/american_pie_tom1.mp3'},
+        // {file: 'audio/american_pie_tom2.mp3'},
+        // {file: 'audio/diamonds_cymbal.mp3'},
+        // {file: 'audio/once_in_a_lifetime_cymbal.mp3'},
+        // {file: 'audio/once_in_a_lifetime_kick.mp3'},
+        // {file: 'audio/reaper_cymbal.mp3'},
+        // {file: 'audio/reaper_kick.mp3'},
+        // {file: 'audio/space_oddity_snare.mp3'},
+        {file: 'audio/your_eyes_tom_triangle.mp3'},
+        {file: 'audio/your_eyes_tom_triangle2.mp3'},
+        {file: 'audio/your_eyes_tom4.mp3'},
+        {file: 'audio/your_eyes_triangle.mp3'},
       ]
     };
     this.opt = _.extend({}, defaults, options);
@@ -26,6 +39,35 @@ var Player = (function() {
     this.loadInstruments(this.opt.instruments);
   };
 
+  Player.prototype.animateInstrument = function(instrument){
+    var start = 0.2;
+    var end = instrument.sound.volume();
+    var $el = instrument.el;
+
+    console.log(end)
+
+    // ensure end is not less than start
+    end = _.max([start, end]);
+
+    $el.css({
+      background: '#ffffff',
+      'box-shadow': '0 0 30px 20px #ffffff',
+      opacity: end,
+      transform: 'scale('+end+')'
+    });
+
+    setTimeout(function(){
+      $el.css({
+        background: '#fff9c9',
+        'box-shadow': '0 0 30px 20px #fff9c9',
+        opacity: start,
+        transform: 'scale('+start+')'
+      });
+    }, 200);
+
+
+  };
+
   Player.prototype.loadInstruments = function(instruments){
     var _this = this;
 
@@ -33,17 +75,27 @@ var Player = (function() {
     this.instrumentsCount = instruments.length;
     this.instrumentsLoaded = 0;
 
+    var $container = $('.player-wrapper');
+    var $players = $('<div class="players">')
+
     _.each(instruments, function(i, index){
       // Use Howler.js as player
       var sound = new Howl({
         src: [i.file],
         onload: function(){ _this.onInstrumentLoad(i); }
       });
+      // Create element
+      var $el = $('<div class="player">');
+      $players.append($el);
       // Add instrument
       _this.instruments.push({
         i: index,
-        sound: sound
+        sound: sound,
+        el: $el
       });
+
+      // add players to the UI
+      $container.append($players);
     });
   };
 
@@ -69,8 +121,10 @@ var Player = (function() {
     var now = new Date();
 
     _.each(this.instruments, function(i, index){
+      // check if instrument should play
       if (now > i.playNext) {
         i.sound.play();
+        _this.animateInstrument(i);
         _this.instruments[index].playNext = new Date(i.playNext.getTime() + i.rhythm);
       }
     });
