@@ -61,12 +61,13 @@ html {
 }
 
 .canvas-wrapper {
-  canvas {
+  .canvas-container {
     position: absolute;
     width: 92%;
     height: 92%;
     top: 4%;
     left: 4%;
     background: $grayDarkest;
+    cursor: crosshair;
   }
 }

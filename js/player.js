@@ -44,8 +44,6 @@ var Player = (function() {
     var end = instrument.sound.volume();
     var $el = instrument.el;
 
-    console.log(end)
-
     // ensure end is not less than start
     end = _.max([start, end]);
 
@@ -64,7 +62,6 @@ var Player = (function() {
         transform: 'scale('+start+')'
       });
     }, 200);
-
 
   };
 
