@@ -68,7 +68,7 @@ var Canvas = (function() {
 
     _.each(points, function(p, i){
       var lerp = 1.0 - (now - p.t) / ms;
-      if (lerp > 0) {
+      if (lerp > 0 && lerp <= 1) {
         var x = p.x - 20;
         var y = p.y - 20;
         var radgrad = ctx.createRadialGradient(x, y, quarter*lerp, x, y, half*lerp);
