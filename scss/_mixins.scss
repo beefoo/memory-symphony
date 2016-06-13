@@ -125,6 +125,13 @@
        -o-transition: -o-transform $values;
           transition: transform $values;
 }
+@mixin transition-delay($params){
+  -moz-transition-delay:    $params;
+  -o-transition-delay:      $params;
+  -webkit-transition-delay: $params;
+  -ms-transition-delay:     $params;
+  transition-delay:         $params;
+}
 @mixin icon($content: "none") {
   @if ( $content != "none") {
     content: "#{$content}";

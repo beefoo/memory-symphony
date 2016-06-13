@@ -12,6 +12,7 @@ var Player = (function() {
     this.opt.maxRhythm *= this.opt.baseRhythm;
 
     this.loadInstruments(this.opt.instruments);
+    this.loadListeners();
   };
 
   Player.prototype.animateInstrument = function(instrument){
@@ -68,6 +69,12 @@ var Player = (function() {
 
       // add players to the UI
       $container.append($players);
+    });
+  };
+
+  Player.prototype.loadListeners = function(){
+    $.subscribe('path.processed', function(e, memory){
+      console.log('Processed path ', memory);
     });
   };
 

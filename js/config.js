@@ -1,4 +1,10 @@
 var CONFIG = {
+
+  canvas: {
+    strokeWidth: 40,
+    strokeMs: 2000
+  },
+
   player: {
     baseRhythm: 800, // integer, millisecond interval
     minRhythm: 4,     // float, base multiplier
@@ -49,10 +55,5 @@ var CONFIG = {
       // {file: 'audio/reaper_kick.mp3'},
       // {file: 'audio/space_oddity_snare.mp3'},
     ]
-  },
-
-  canvas: {
-    strokeWidth: 40,
-    strokeMs: 2000
   }
 };
