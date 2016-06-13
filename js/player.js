@@ -1,31 +1,6 @@
 var Player = (function() {
   function Player(options) {
-    var defaults = {
-      baseRhythm: 800, // integer, millisecond interval
-      minRhythm: 4,     // float, base multiplier
-      maxRhythm: 0.1,  // float, base multiplier
-      increment: 0.2,   // float, amount to increment rhythm per step
-      instruments: [
-        {file: 'audio/good_day_kick_01.mp3'},
-        {file: 'audio/your_eyes_tom.mp3'},
-        {file: 'audio/your_eyes_tom2.mp3'},
-        {file: 'audio/your_eyes_tom3.mp3'},
-        // {file: 'audio/good_day_snare_01.mp3'},
-        // {file: 'audio/american_pie_snare.mp3'},
-        // {file: 'audio/american_pie_tom1.mp3'},
-        // {file: 'audio/american_pie_tom2.mp3'},
-        // {file: 'audio/diamonds_cymbal.mp3'},
-        // {file: 'audio/once_in_a_lifetime_cymbal.mp3'},
-        // {file: 'audio/once_in_a_lifetime_kick.mp3'},
-        // {file: 'audio/reaper_cymbal.mp3'},
-        // {file: 'audio/reaper_kick.mp3'},
-        // {file: 'audio/space_oddity_snare.mp3'},
-        {file: 'audio/your_eyes_tom_triangle.mp3'},
-        {file: 'audio/your_eyes_tom_triangle2.mp3'},
-        {file: 'audio/your_eyes_tom4.mp3'},
-        {file: 'audio/your_eyes_triangle.mp3'},
-      ]
-    };
+    var defaults = {};
     this.opt = _.extend({}, defaults, options);
     this.init();
   }
@@ -194,5 +169,5 @@ var Player = (function() {
 })();
 
 $(function(){
-  var player = new Player();
+  var player = new Player(CONFIG.player);
 });

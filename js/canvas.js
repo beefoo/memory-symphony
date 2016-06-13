@@ -1,9 +1,6 @@
 var Canvas = (function() {
   function Canvas(options) {
-    var defaults = {
-      strokeWidth: 40,
-      strokeMs: 2000
-    };
+    var defaults = {};
     this.opt = _.extend({}, defaults, options);
     this.init();
   }
@@ -94,5 +91,5 @@ var Canvas = (function() {
 })();
 
 $(function(){
-  var canvas = new Canvas();
+  var canvas = new Canvas(CONFIG.canvas);
 });
