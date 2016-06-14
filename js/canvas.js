@@ -15,7 +15,7 @@ var Canvas = (function() {
     var ctx = $canvas[0].getContext('2d');
 
     // render it
-    this.renderPoints(points, ctx, [255, 228, 94]);
+    this.renderPoints(points, this.$canvas.offset(), ctx, [255, 228, 94]);
 
     // add it
     $canvas.addClass('burst');
@@ -68,11 +68,13 @@ var Canvas = (function() {
     var _this = this;
     var points = [];
     var ms = this.opt.strokeMs;
+    var offset = this.$canvas.offset()
 
     this.$canvas.hammer().on("panstart", function(e){
       var now = new Date();
       var x = e.gesture.center.x;
       var y = e.gesture.center.y;
+      offset = $(this).offset();
       points = [{x: x, y: y, z: 1, t: now}];
     });
 
@@ -88,7 +90,7 @@ var Canvas = (function() {
       var y = e.gesture.center.y;
       points.push({x: x, y: y, z: 1, t: now});
       points = _this.lerpPoints(points);
-      _this.renderPoints(points);
+      _this.renderPoints(points, offset);
     });
 
     this.$canvas.hammer().on("panend", function(e){
@@ -110,7 +112,8 @@ var Canvas = (function() {
     $.publish('path.create', points);
   };
 
-  Canvas.prototype.renderPoints = function(points, ctx, color){
+  Canvas.prototype.renderPoints = function(points, offset, ctx, color){
+    offset = offset || this.$canvas.offset();
     ctx = ctx || this.ctx;
     color = color || [255, 255, 255];
     color = color.join(',');
@@ -122,8 +125,8 @@ var Canvas = (function() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     _.each(points, function(p, i){
-      var x = p.x - 20;
-      var y = p.y - 20;
+      var x = p.x - offset.left;
+      var y = p.y - offset.top;
       var z = p.z;
       var radgrad = ctx.createRadialGradient(x, y, quarter*z, x, y, half*z);
 

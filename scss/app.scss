@@ -63,11 +63,12 @@ html {
 .canvas-wrapper {
   .canvas-container {
     position: absolute;
-    width: 92%;
-    height: 92%;
-    top: 4%;
-    left: 4%;
+    width: 86%;
+    height: 86%;
+    top: 7%;
+    left: 7%;
     background: $grayDarkest;
+    box-shadow: 0 0 30px 20px $grayDarkest;
     cursor: crosshair;
   }
   canvas {
