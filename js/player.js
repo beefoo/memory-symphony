@@ -73,8 +73,12 @@ var Player = (function() {
   };
 
   Player.prototype.loadListeners = function(){
-    $.subscribe('path.processed', function(e, memory){
-      console.log('Processed path ', memory);
+    var _this = this;
+
+    $.subscribe('path.processed', function(e, data){
+      console.log('Processed path ', data.memory);
+
+      _this.setWeightedPlay(_.pluck(data.memory, 'weight'));
     });
   };
 
@@ -83,8 +87,8 @@ var Player = (function() {
 
     // All instruments have been loaded
     if (this.instrumentsLoaded >= this.instrumentsCount) {
-      // this.setDefaultPlay();
-      this.setWeightedPlay();
+      this.setDefaultPlay();
+      // this.setWeightedPlay();
       this.play();
     }
   };
@@ -127,36 +131,35 @@ var Player = (function() {
     _.each(this.instruments, function(i, index){
       var offset = index * opt.increment;
 
-      _this.instruments[index].rhythm = opt.baseRhythm;
+      _this.instruments[index].rhythm = opt.minRhythm;
       if (!i.offset) _this.instruments[index].offset = offset;
-      _this.instruments[index].sound.volume(0.5);
+      _this.instruments[index].sound.volume(0.3);
 
       // update dynamic properties
       if (!i.playNext) _this.instruments[index].playNext = new Date(now.getTime() + offset);
     });
   };
 
-  Player.prototype.setWeightedPlay = function(){
+  Player.prototype.setWeightedPlay = function(weights){
     var _this = this;
     var opt = this.opt;
     var now = new Date();
 
-    // temporarily hand-coded weights
-    var count = this.instrumentsCount;
-    var step = 1.0 / count;
-    var weights = [];
-    _(count).times(function(n){
-      weights.push(n*step);
-    });
-    var rand = _.random(0, count-1);
-    weights = [].concat(weights.slice(rand), weights.slice(0, rand));
-
     _.each(this.instruments, function(i, index){
       var offset = index * opt.increment;
 
-      _this.instruments[index].rhythm = _this._roundToNearest(weights[index] * (opt.maxRhythm - opt.minRhythm) + opt.minRhythm, opt.increment);
+      // weight not active, so instrument not active
+      if (index >= weights.length) {
+        _this.instruments[index].rhythm = opt.minRhythm;
+        _this.instruments[index].sound.volume(0);
+
+      // assign weight to instrument
+      } else {
+        _this.instruments[index].rhythm = _this._roundToNearest(weights[index] * (opt.maxRhythm - opt.minRhythm) + opt.minRhythm, opt.increment);
+        _this.instruments[index].sound.volume(weights[index]);
+      }
+
       if (!i.offset) _this.instruments[index].offset = offset;
-      _this.instruments[index].sound.volume(weights[index]);
 
       // update dynamic properties
       if (!i.playNext) _this.instruments[index].playNext = new Date(now.getTime() + offset);

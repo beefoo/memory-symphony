@@ -109,7 +109,7 @@ var Canvas = (function() {
     this.burst(points);
 
     // publish points
-    $.publish('path.create', points);
+    $.publish('path.create', {points: points});
   };
 
   Canvas.prototype.renderPoints = function(points, offset, ctx, color){

@@ -6,9 +6,9 @@ var CONFIG = {
   },
 
   player: {
-    baseRhythm: 800, // integer, millisecond interval
+    baseRhythm: 1000, // integer, millisecond interval
     minRhythm: 4,     // float, base multiplier
-    maxRhythm: 0.1,  // float, base multiplier
+    maxRhythm: 0.4,  // float, base multiplier
     increment: 0.2,   // float, amount to increment rhythm per step
     instruments: [
       {file: 'audio/arms1.mp3'},

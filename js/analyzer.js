@@ -41,8 +41,8 @@ var Analyzer = (function() {
   Analyzer.prototype.loadListeners = function(){
     var _this = this;
 
-    $.subscribe('path.create', function(e, points){
-      _this.observe(points);
+    $.subscribe('path.create', function(e, data){
+      _this.observe(data.points);
     });
   };
 
@@ -50,11 +50,15 @@ var Analyzer = (function() {
     var scaleTo = 100.0;
     var nPoints = [];
 
+    // console.log('Raw points', points);
+
     // translate to (0,0) and scale
-    var min_x = _.min(points, function(p){ return p.x; });
-    var min_y = _.min(points, function(p){ return p.y; });
-    var max_x = _.max(points, function(p){ return p.x; });
-    var max_y = _.max(points, function(p){ return p.y; });
+    var xs = _.pluck(points, 'x');
+    var ys = _.pluck(points, 'y');
+    var min_x = _.min(xs);
+    var min_y = _.min(ys);
+    var max_x = _.max(xs);
+    var max_y = _.max(ys);
     var multiplier = scaleTo / _.max([max_x-min_x, max_y-min_y]);
     _.each(points, function(p){
       var n = {};
@@ -71,6 +75,8 @@ var Analyzer = (function() {
 
   Analyzer.prototype.observe = function(points){
     points = this.normalizePoints(points);
+
+    // console.log('Normalized points', points);
 
     if (this.memory.length < this.memoryLimit - 1) {
       this.addToMemory(points);
@@ -89,15 +95,18 @@ var Analyzer = (function() {
       mem[i].distance = distance;
     });
 
-    // normalize distances
-    var min_dist = _.min(mem, function(m){ return m.distance; });
-    var max_dist = _.max(mem, function(m){ return m.distance; });
+    // normalize distances to create weights
+    var ds = _.pluck(mem, 'distance');
+    var min_dist = _.min(ds);
+    var max_dist = _.max(ds);
     mem = _.map(mem, function(m){
-      m.distance = (m.distance - min_dist)/(max_dist - min_dist);
+      if (max_dist - min_dist <= 0) m.weight = 0;
+      else m.weight = (m.distance - min_dist)/(max_dist - min_dist);
+      m.weight = 1 - m.weight;
       return m;
     });
 
-    $.publish('path.processed', mem);
+    $.publish('path.processed', {memory: mem});
   };
 
   Analyzer.prototype._euclideanDistance = function(x1, y1, x2, y2) {
