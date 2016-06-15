@@ -30,16 +30,16 @@ var Analyzer = (function() {
   Analyzer.prototype.distanceBetween = function(p1, p2) {
     var distances = [];
     for (var i = 0; i < p1.length; i++) {
-      min = Number.MAX_VALUE;
+      var min = -1;
       for (var j = 0; j < p2.length; j++) {
-        dis = this._dist(p1[i].x, p1[i].y, p2[j].x, p2[j].y);
-        if (dis < min) {
+        var dis = this._dist(p1[i].x, p1[i].y, p2[j].x, p2[j].y);
+        if (min < 0 || dis < min) {
           min = dis;
         } else if (dis == 0) {
           break;
         }
       }
-      distances.push(min)
+      if (min >= 0) distances.push(min)
     }
     var sum = _.reduce(distances, function(memo, num){ return memo + num; }, 0);
     return distances.length ? sum / distances.length : 0;
@@ -151,20 +151,21 @@ var Analyzer = (function() {
     var tweened = [];
 
     for (var i = 0; i < p1.length; i++) {
-      var min = Number.MAX_VALUE;
+      var min = -1;
       var min_j = -1;
       for (var j = 0; j < p2.length; j++) {
         var dis = this._dist(p1[i].x, p1[i].y, p2[j].x, p2[j].y);
-        if (dis < min) {
+        if (min < 0 || dis < min) {
           min = dis;
           min_j = j;
         } else if (dis == 0) {
           break;
         }
       }
-
-      var pt = _this.lerp(p1[i].x, p1[i].y, p2[min_j].x, p2[min_j].y, amount);
-      tweened.push(pt);
+      if (min_j >= 0) {
+        var pt = _this.lerp(p1[i].x, p1[i].y, p2[min_j].x, p2[min_j].y, amount);
+        tweened.push(pt);
+      }
     }
     return tweened;
   };
