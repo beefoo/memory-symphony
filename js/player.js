@@ -167,7 +167,7 @@ var Player = (function() {
         var weight = weights[index];
         weight = Math.pow(weight, 3);
         // weight *= weight; // weight the weights
-        if (weight < 1) weight *= 0.9;
+        if (weight < 1) weight *= 0.95;
         var rhythm = _this._roundToNearest(weight * (opt.maxRhythm - opt.minRhythm) + opt.minRhythm, opt.increment);
         _this.instruments[index].rhythm = rhythm;
         _this.instruments[index].sound.volume(weight);

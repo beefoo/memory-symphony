@@ -31,8 +31,9 @@ var CONFIG = {
     baseRhythm: 1000, // integer, millisecond interval
     minRhythm: 6,     // float, base multiplier
     maxRhythm: 0.8,  // float, base multiplier
-    increment: 0.2,   // float, amount to increment rhythm per step
+    increment: 0.25,   // float, amount to increment rhythm per step
     restAfter: 6000,
+    fade: 1000,
     instruments: [
       {file: 'audio/eternal_theme_bass_1.mp3'},
       {file: 'audio/eternal_theme_bass_2.mp3'},

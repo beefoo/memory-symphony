@@ -82,7 +82,7 @@ html {
       z-index: 50;
       @include transform(scale(1));
       @include transition-list(transform 5s, opacity 5s);
-      @include transition-delay(1s);
+      @include transition-delay(0.5s);
     }
   }
 }
