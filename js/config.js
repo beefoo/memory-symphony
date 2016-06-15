@@ -29,26 +29,30 @@ var CONFIG = {
 
   player: {
     baseRhythm: 1000, // integer, millisecond interval
-    minRhythm: 4,     // float, base multiplier
-    maxRhythm: 0.5,  // float, base multiplier
+    minRhythm: 6,     // float, base multiplier
+    maxRhythm: 0.8,  // float, base multiplier
     increment: 0.2,   // float, amount to increment rhythm per step
+    restAfter: 6000,
     instruments: [
-      {file: 'audio/arms1.mp3'},
-      {file: 'audio/arms2.mp3'},
-      {file: 'audio/baby1.mp3'},
-      {file: 'audio/ehvamp1.mp3'},
-      {file: 'audio/ehvamp2b.mp3'},
-      {file: 'audio/flourish.mp3'},
-      {file: 'audio/guithi3.mp3'},
-      {file: 'audio/guitlo2.mp3'},
-      {file: 'audio/guitvain.mp3'},
-      {file: 'audio/hornkick.mp3'},
-      {file: 'audio/kick.mp3'},
-      {file: 'audio/mykick2.mp3'},
-      {file: 'audio/new1.mp3'},
-      {file: 'audio/snare.mp3'},
-      {file: 'audio/stand.mp3'},
-      {file: 'audio/tearsbass.mp3'},
+      {file: 'audio/eternal_theme_bass_1.mp3'},
+      {file: 'audio/eternal_theme_bass_2.mp3'},
+      {file: 'audio/eternal_theme_bass_3.mp3'},
+      {file: 'audio/eternal_theme_bass_4.mp3'},
+      {file: 'audio/eternal_theme_bass_5.mp3'},
+      {file: 'audio/eternal_theme_piano_1.mp3'},
+      {file: 'audio/eternal_theme_piano_2.mp3'},
+      // {file: 'audio/eternal_theme_piano_3.mp3'},
+      // {file: 'audio/eternal_theme_piano_4.mp3'},
+      // {file: 'audio/eternal_theme_piano_5.mp3'},
+      {file: 'audio/eternal_main_guitar_1.mp3'},
+      {file: 'audio/eternal_peer_piano_1.mp3'},
+      {file: 'audio/eternal_peer_piano_2.mp3'},
+      {file: 'audio/eternal_peer_piano_3.mp3'},
+      {file: 'audio/eternal_peer_piano_4.mp3'},
+      {file: 'audio/eternal_row_piano_1.mp3'},
+      {file: 'audio/eternal_row_piano_2.mp3'},
+      {file: 'audio/eternal_row_piano_3.mp3'},
+      {file: 'audio/eternal_row_piano_4.mp3'}
     ]
   }
 };

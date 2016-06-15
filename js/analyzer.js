@@ -111,6 +111,7 @@ var Analyzer = (function() {
 
   Analyzer.prototype.processFromMemory = function(points){
     var _this = this;
+    points = _.map(points, _.clone);
 
     // calculate distance between each path
     this.memory = _.each(this.memory, function(node, i){
@@ -121,6 +122,7 @@ var Analyzer = (function() {
 
     // normalize distances to create weights
     var ds = _.pluck(this.memory, 'distance');
+    // console.log('Distances', ds);
     var min_dist = _.min(ds);
     var max_dist = _.max(ds);
     this.memory = _.map(this.memory, function(node){
@@ -135,6 +137,7 @@ var Analyzer = (function() {
     var tweened = this.tween(closest, points, _.max([Math.pow(0.5, closest.count), 0.1]));
     this.memory[closest.index].count += 1;
     // this.memory[closest.index].points = tweened;
+    // this.memory[closest.index].points = points;
 
     $.publish('debug.message', ['Matched node '+(closest.index+1)+ ' with distance '+closest.distance, true]);
     $.publish('path.processed', {memory: this.memory});

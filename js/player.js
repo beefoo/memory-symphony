@@ -103,6 +103,12 @@ var Player = (function() {
     var _this = this;
     var now = new Date();
 
+    // determine if we should rest
+    if (this.setWeightedPlayDate && (now - this.setWeightedPlayDate) >= this.opt.restAfter) {
+      this.setDefaultPlay();
+      this.setWeightedPlayDate = false;
+    }
+
     _.each(this.instruments, function(i, index){
       // check if instrument should play
       if (now > i.playNext) {
@@ -161,11 +167,11 @@ var Player = (function() {
         var weight = weights[index];
         weight = Math.pow(weight, 3);
         // weight *= weight; // weight the weights
-        //if (weight < 1) weight *= 0.8;
+        if (weight < 1) weight *= 0.9;
         var rhythm = _this._roundToNearest(weight * (opt.maxRhythm - opt.minRhythm) + opt.minRhythm, opt.increment);
         _this.instruments[index].rhythm = rhythm;
         _this.instruments[index].sound.volume(weight);
-        offset = rhythm * index;
+        offset = index * opt.increment;
         if (weight >= 1) offset = 0;
       }
 
@@ -174,6 +180,8 @@ var Player = (function() {
       // update dynamic properties
       _this.instruments[index].playNext = new Date(now.getTime() + offset);
     });
+
+    this.setWeightedPlayDate = now;
   };
 
   Player.prototype.stop = function(){
