@@ -11,31 +11,38 @@ var Analyzer = (function() {
     this.memory = [];
     this.memoryLimit = this.opt.player.instruments.length;
     this.mode = 'learn'; // or: listen
+    this.loadMemory(this.opt.points);
     this.loadListeners();
   };
 
   Analyzer.prototype.addToMemory = function(points){
     if (this.memory.length >= this.memoryLimit) return false;
-    this.memory.push({points: points});
+    var index = this.memory.length;
+    this.memory.push({
+      index: index,
+      distance: 0,
+      weight: 0,
+      count: 1,
+      points: points
+    });
   };
 
   Analyzer.prototype.distanceBetween = function(p1, p2) {
-    var h_max = Number.MIN_VALUE, h_min, dis;
+    var distances = [];
     for (var i = 0; i < p1.length; i++) {
-      h_min = Number.MAX_VALUE;
+      min = Number.MAX_VALUE;
       for (var j = 0; j < p2.length; j++) {
-        dis = this._euclideanDistance(p1[i].x, p1[i].y, p2[j].x, p2[j].y);
-        if (dis < h_min) {
-             h_min = dis;
+        dis = this._dist(p1[i].x, p1[i].y, p2[j].x, p2[j].y);
+        if (dis < min) {
+          min = dis;
         } else if (dis == 0) {
           break;
         }
       }
-      if (h_min > h_max) {
-        h_max = h_min;
-      }
+      distances.push(min)
     }
-    return h_max;
+    var sum = _.reduce(distances, function(memo, num){ return memo + num; }, 0);
+    return distances.length ? sum / distances.length : 0;
   };
 
   Analyzer.prototype.loadListeners = function(){
@@ -46,7 +53,16 @@ var Analyzer = (function() {
     });
   };
 
+  Analyzer.prototype.loadMemory = function(points){
+    var _this = this;
+
+    _.each(points, function(p){
+      _this.addToMemory(p);
+    });
+  };
+
   Analyzer.prototype.normalizePoints = function(points){
+    var _this = this;
     var scaleTo = 100.0;
     var nPoints = [];
 
@@ -62,8 +78,8 @@ var Analyzer = (function() {
     var multiplier = scaleTo / _.max([max_x-min_x, max_y-min_y]);
     _.each(points, function(p){
       var n = {};
-      n.x = (p.x - min_x) * multiplier;
-      n.y = (p.y - min_y) * multiplier;
+      n.x = _this._round((p.x - min_x) * multiplier, 3);
+      n.y = _this._round((p.y - min_y) * multiplier, 3);
       nPoints.push(n);
     });
 
@@ -74,43 +90,96 @@ var Analyzer = (function() {
   };
 
   Analyzer.prototype.observe = function(points){
+    $.publish('debug.message', ['Processing stroke data', false]);
+
     points = this.normalizePoints(points);
 
     // console.log('Normalized points', points);
 
-    if (this.memory.length < this.memoryLimit - 1) {
+    if (this.memory.length < this.memoryLimit) {
       this.addToMemory(points);
     }
+
+    // if (this.memory.length >= this.memoryLimit) {
+    //   var obj = _.pluck(this.memory, 'points');
+    //   var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+    //   window.open(data, "", "_blank");
+    // }
 
     this.processFromMemory(points);
   };
 
   Analyzer.prototype.processFromMemory = function(points){
     var _this = this;
-    var mem = this.memory;
 
     // calculate distance between each path
-    _.each(mem, function(node, i){
+    this.memory = _.each(this.memory, function(node, i){
       var distance = _this.distanceBetween(node.points, points);
-      mem[i].distance = distance;
+      node.distance = distance;
+      return node;
     });
 
     // normalize distances to create weights
-    var ds = _.pluck(mem, 'distance');
+    var ds = _.pluck(this.memory, 'distance');
     var min_dist = _.min(ds);
     var max_dist = _.max(ds);
-    mem = _.map(mem, function(m){
-      if (max_dist - min_dist <= 0) m.weight = 0;
-      else m.weight = (m.distance - min_dist)/(max_dist - min_dist);
-      m.weight = 1 - m.weight;
-      return m;
+    this.memory = _.map(this.memory, function(node){
+      if (max_dist - min_dist <= 0) node.weight = 0;
+      else node.weight = (node.distance - min_dist)/(max_dist - min_dist);
+      node.weight = 1 - node.weight;
+      return node;
     });
 
-    $.publish('path.processed', {memory: mem});
+    // find the closest match and tween
+    var closest = _.min(this.memory, function(m){ return m.distance; });
+    var tweened = this.tween(closest, points, _.max([Math.pow(0.5, closest.count), 0.1]));
+    this.memory[closest.index].count += 1;
+    // this.memory[closest.index].points = tweened;
+
+    $.publish('debug.message', ['Matched node '+(closest.index+1)+ ' with distance '+closest.distance, true]);
+    $.publish('path.processed', {memory: this.memory});
   };
 
-  Analyzer.prototype._euclideanDistance = function(x1, y1, x2, y2) {
+  Analyzer.prototype.tween = function(fromPoints, toPoints, amount){
+    amount = amount || 0.5;
+    var _this = this;
+    var p1 = fromPoints;
+    var p2 = toPoints;
+    var tweened = [];
+
+    for (var i = 0; i < p1.length; i++) {
+      var min = Number.MAX_VALUE;
+      var min_j = -1;
+      for (var j = 0; j < p2.length; j++) {
+        var dis = this._dist(p1[i].x, p1[i].y, p2[j].x, p2[j].y);
+        if (dis < min) {
+          min = dis;
+          min_j = j;
+        } else if (dis == 0) {
+          break;
+        }
+      }
+
+      var pt = _this.lerp(p1[i].x, p1[i].y, p2[min_j].x, p2[min_j].y, amount);
+      tweened.push(pt);
+    }
+    return tweened;
+  };
+
+  Analyzer.prototype._dist = function(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
+  };
+
+  Analyzer.prototype._lerp = function(x1, y1, x2, y2, amt) {
+    var nx = x1+(x2-x1)*amt;
+    var ny = y1+(y2-y1)*amt;
+    return {x: nx, y: ny};
+  };
+
+  Analyzer.prototype._round = function(num, dec) {
+    num = parseFloat(num);
+    dec = dec || 0;
+    return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
   };
 
   return Analyzer;

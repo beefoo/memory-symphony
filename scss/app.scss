@@ -86,3 +86,22 @@ html {
     }
   }
 }
+
+#debug {
+  display: none;
+  width: auto;
+  padding: 0 10px;
+  height: 40px;
+  line-height: 40px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: $yellow;
+  color: $grayDark;
+  font-size: 0.8em;
+
+  &.active {
+    display: block;
+  }
+}

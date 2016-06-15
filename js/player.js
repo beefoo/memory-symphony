@@ -76,9 +76,9 @@ var Player = (function() {
     var _this = this;
 
     $.subscribe('path.processed', function(e, data){
-      console.log('Processed path ', data.memory);
-
-      _this.setWeightedPlay(_.pluck(data.memory, 'weight'));
+      var weights = _.pluck(data.memory, 'weight');
+      console.log('Setting weights', weights);
+      _this.setWeightedPlay(weights);
     });
   };
 
@@ -127,16 +127,19 @@ var Player = (function() {
     var _this = this;
     var opt = this.opt;
     var now = new Date();
+    var restRhythm = opt.baseRhythm * 0.25 * this.instruments.length;
 
     _.each(this.instruments, function(i, index){
-      var offset = index * opt.increment;
+      // var offset = index * opt.baseRhythm * 0.5;
+      // var offset = _this._roundToNearest(_.random(0, restRhythm), opt.increment);
+      var offset = _.random(0, restRhythm);
 
-      _this.instruments[index].rhythm = opt.minRhythm;
-      if (!i.offset) _this.instruments[index].offset = offset;
+      _this.instruments[index].rhythm = restRhythm;
+      _this.instruments[index].offset = offset;
       _this.instruments[index].sound.volume(0.3);
 
       // update dynamic properties
-      if (!i.playNext) _this.instruments[index].playNext = new Date(now.getTime() + offset);
+      _this.instruments[index].playNext = new Date(now.getTime() + offset);
     });
   };
 
@@ -146,7 +149,7 @@ var Player = (function() {
     var now = new Date();
 
     _.each(this.instruments, function(i, index){
-      var offset = index * opt.increment;
+      var offset = 0;
 
       // weight not active, so instrument not active
       if (index >= weights.length) {
@@ -155,14 +158,21 @@ var Player = (function() {
 
       // assign weight to instrument
       } else {
-        _this.instruments[index].rhythm = _this._roundToNearest(weights[index] * (opt.maxRhythm - opt.minRhythm) + opt.minRhythm, opt.increment);
-        _this.instruments[index].sound.volume(weights[index]);
+        var weight = weights[index];
+        weight = Math.pow(weight, 3);
+        // weight *= weight; // weight the weights
+        //if (weight < 1) weight *= 0.8;
+        var rhythm = _this._roundToNearest(weight * (opt.maxRhythm - opt.minRhythm) + opt.minRhythm, opt.increment);
+        _this.instruments[index].rhythm = rhythm;
+        _this.instruments[index].sound.volume(weight);
+        offset = rhythm * index;
+        if (weight >= 1) offset = 0;
       }
 
-      if (!i.offset) _this.instruments[index].offset = offset;
+      _this.instruments[index].offset = offset;
 
       // update dynamic properties
-      if (!i.playNext) _this.instruments[index].playNext = new Date(now.getTime() + offset);
+      _this.instruments[index].playNext = new Date(now.getTime() + offset);
     });
   };
 

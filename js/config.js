@@ -1,5 +1,27 @@
 var CONFIG = {
 
+  debug: true,
+
+  // seed strokes: 0-9, a-f
+  points: [
+    [{"x":39.382,"y":3.089},{"x":6.564,"y":32.432},{"x":0,"y":68.726},{"x":20.849,"y":96.911},{"x":60.618,"y":98.842},{"x":67.568,"y":26.255},{"x":34.749,"y":0}],
+    [{"x":1.905,"y":0},{"x":0,"y":98.095}],
+    [{"x":11.29,"y":15.323},{"x":38.71,"y":0.403},{"x":50,"y":31.048},{"x":0,"y":96.371},{"x":67.742,"y":98.79}],
+    [{"x":5.072,"y":18.478},{"x":38.768,"y":4.71},{"x":43.478,"y":27.899},{"x":26.449,"y":46.377},{"x":48.551,"y":72.101},{"x":30.435,"y":99.275},{"x":0,"y":87.681}],
+    [{"x":35.391,"y":0},{"x":0.823,"y":49.794},{"x":72.84,"y":53.909},{"x":52.263,"y":9.877},{"x":41.152,"y":13.58},{"x":42.798,"y":98.765}],
+    [{"x":45.608,"y":8.784},{"x":1.351,"y":0},{"x":4.73,"y":43.919},{"x":51.014,"y":50.338},{"x":60.811,"y":73.311},{"x":35.135,"y":98.311},{"x":0,"y":89.189}],
+    [{"x":38.889,"y":0},{"x":11.111,"y":23.704},{"x":0.37,"y":64.815},{"x":15.185,"y":97.037},{"x":59.63,"y":88.519},{"x":45.185,"y":60.37},{"x":10.37,"y":80.37}],
+    [{"x":0,"y":0},{"x":55.749,"y":11.847},{"x":24.39,"y":100}],
+    [{"x":35.57,"y":1.342},{"x":14.43,"y":0.671},{"x":0,"y":20.47},{"x":49.664,"y":73.154},{"x":36.577,"y":100},{"x":13.087,"y":72.819},{"x":42.617,"y":19.463},{"x":32.215,"y":0.336}],
+    [{"x":27.248,"y":3.815},{"x":0.545,"y":14.986},{"x":21.798,"y":35.15},{"x":36.785,"y":8.719},{"x":28.61,"y":99.455}],
+    [{"x":82.524,"y":12.136},{"x":61.65,"y":0.485},{"x":28.155,"y":8.738},{"x":0,"y":44.66},{"x":19.903,"y":70.874},{"x":66.019,"y":66.99},{"x":83.495,"y":54.854},{"x":84.951,"y":19.903},{"x":100,"y":81.068}],
+    [{"x":2.264,"y":0},{"x":0.377,"y":89.434},{"x":42.264,"y":92.075},{"x":36.981,"y":58.113},{"x":2.642,"y":62.642}],
+    [{"x":78.61,"y":11.23},{"x":45.989,"y":0},{"x":15.508,"y":16.578},{"x":0.535,"y":65.241},{"x":20.321,"y":94.652},{"x":83.957,"y":91.444}],
+    [{"x":39.502,"y":59.431},{"x":6.05,"y":61.566},{"x":5.338,"y":93.238},{"x":25.623,"y":99.644},{"x":39.502,"y":81.139},{"x":36.655,"y":0}],
+    [{"x":14.01,"y":32.367},{"x":57.488,"y":21.739},{"x":61.353,"y":3.865},{"x":11.594,"y":5.314},{"x":1.932,"y":56.039},{"x":31.401,"y":99.034},{"x":77.778,"y":78.261}],
+    [{"x":52.836,"y":6.567},{"x":33.433,"y":2.388},{"x":27.761,"y":15.224},{"x":30.448,"y":95.522},{"x":41.791,"y":90.448},{"x":44.776,"y":57.91},{"x":0,"y":51.045}]
+  ],
+
   canvas: {
     strokeWidth: 40,
     strokeMs: 2000
@@ -8,14 +30,12 @@ var CONFIG = {
   player: {
     baseRhythm: 1000, // integer, millisecond interval
     minRhythm: 4,     // float, base multiplier
-    maxRhythm: 0.4,  // float, base multiplier
+    maxRhythm: 0.5,  // float, base multiplier
     increment: 0.2,   // float, amount to increment rhythm per step
     instruments: [
       {file: 'audio/arms1.mp3'},
       {file: 'audio/arms2.mp3'},
       {file: 'audio/baby1.mp3'},
-      // {file: 'audio/breath.mp3'},
-      // {file: 'audio/crybass.mp3'},
       {file: 'audio/ehvamp1.mp3'},
       {file: 'audio/ehvamp2b.mp3'},
       {file: 'audio/flourish.mp3'},
@@ -26,34 +46,9 @@ var CONFIG = {
       {file: 'audio/kick.mp3'},
       {file: 'audio/mykick2.mp3'},
       {file: 'audio/new1.mp3'},
-      // {file: 'audio/new2.mp3'},
-      // {file: 'audio/oohbass.mp3'},
       {file: 'audio/snare.mp3'},
-      // {file: 'audio/snarechord1.mp3'},
-      // {file: 'audio/snarestand.mp3'},
       {file: 'audio/stand.mp3'},
-      // {file: 'audio/stringbass.mp3'},
       {file: 'audio/tearsbass.mp3'},
-
-      // {file: 'audio/your_eyes_tom.mp3'},
-      // {file: 'audio/your_eyes_tom2.mp3'},
-      // {file: 'audio/your_eyes_tom3.mp3'},
-      // {file: 'audio/your_eyes_tom_triangle.mp3'},
-      // {file: 'audio/your_eyes_tom_triangle2.mp3'},
-      // {file: 'audio/your_eyes_tom4.mp3'},
-      // {file: 'audio/your_eyes_triangle.mp3'},
-
-      // {file: 'audio/good_day_kick_01.mp3'},
-      // {file: 'audio/good_day_snare_01.mp3'},
-      // {file: 'audio/american_pie_snare.mp3'},
-      // {file: 'audio/american_pie_tom1.mp3'},
-      // {file: 'audio/american_pie_tom2.mp3'},
-      // {file: 'audio/diamonds_cymbal.mp3'},
-      // {file: 'audio/once_in_a_lifetime_cymbal.mp3'},
-      // {file: 'audio/once_in_a_lifetime_kick.mp3'},
-      // {file: 'audio/reaper_cymbal.mp3'},
-      // {file: 'audio/reaper_kick.mp3'},
-      // {file: 'audio/space_oddity_snare.mp3'},
     ]
   }
 };
